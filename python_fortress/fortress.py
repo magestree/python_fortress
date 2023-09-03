@@ -1,4 +1,5 @@
 import logging
+import os
 from io import StringIO
 from typing import Dict, Optional
 
@@ -10,6 +11,18 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://www.passfortress.com/api/"
+
+
+def find_dotenv(filename=".env", raise_error_if_not_found=False, usecwd=False):
+    current_dir = os.getcwd() if usecwd else os.path.dirname(os.path.abspath(__file__))
+    while current_dir != os.path.dirname(current_dir):
+        env_path = os.path.join(current_dir, filename)
+        if os.path.exists(env_path):
+            return env_path
+        current_dir = os.path.dirname(current_dir)
+    if raise_error_if_not_found:
+        raise FileNotFoundError(f"Could not find {filename} file.")
+    return None
 
 
 class Fortress:
@@ -32,14 +45,11 @@ class Fortress:
         self.load_fortress_credentials()
         self.load_headers()
 
-    def load_fortress_credentials(self, dotenv_loader=dotenv_values, env_path=None) -> None:
+    def load_fortress_credentials(self, dotenv_loader=dotenv_values) -> None:
         """
         Load credentials from environment variables using python-dotenv.
         """
-        if env_path:
-            fortress_credentials = dotenv_loader(env_path)
-        else:
-            fortress_credentials = dotenv_loader()
+        fortress_credentials = dotenv_loader(find_dotenv())
         self.api_key = fortress_credentials.get("FORTRESS_API_KEY", "")
         self.access_token = fortress_credentials.get("FORTRESS_ACCESS_TOKEN", "")
         self.master_key = fortress_credentials.get("FORTRESS_MASTER_KEY", "")
