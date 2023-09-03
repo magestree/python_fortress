@@ -1,5 +1,2 @@
-python-dotenv==0.20.0
-requests==2.27.1
-pytest==7.0.1
-requests-mock==1.11.0
-coverage==6.2
+python-dotenv>=0.20.0,<1.0.0  # Carga de variables de entorno
+requests>=2.27.0,<3.0.0  # Realizar peticiones HTTP
