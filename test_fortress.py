@@ -3,7 +3,7 @@ import os
 import pytest
 import requests_mock
 
-from fortress import Fortress, BASE_URL
+from python_fortress.fortress import Fortress, BASE_URL
 
 
 @pytest.fixture

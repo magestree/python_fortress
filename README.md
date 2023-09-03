@@ -23,8 +23,9 @@ pip install -r requirements.txt
 The main module `fortress.py` provides the `Fortress` class and a convenience function `load_env()`.
 
 ## Example:
+
 ```python
-from fortress import load_env
+from python_fortress.fortress import load_env
 
 load_env()
 ```
