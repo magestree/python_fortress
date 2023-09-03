@@ -9,7 +9,7 @@ from dotenv import dotenv_values, load_dotenv
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-BASE_URL = "http://127.0.0.1:8000/api/"
+BASE_URL = "https://www.passfortress.com/api/"
 
 
 class Fortress:
