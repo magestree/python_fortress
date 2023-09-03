@@ -32,11 +32,14 @@ class Fortress:
         self.load_fortress_credentials()
         self.load_headers()
 
-    def load_fortress_credentials(self, dotenv_loader=dotenv_values) -> None:
+    def load_fortress_credentials(self, dotenv_loader=dotenv_values, env_path=None) -> None:
         """
         Load credentials from environment variables using python-dotenv.
         """
-        fortress_credentials = dotenv_loader()
+        if env_path:
+            fortress_credentials = dotenv_loader(env_path)
+        else:
+            fortress_credentials = dotenv_loader()
         self.api_key = fortress_credentials.get("FORTRESS_API_KEY", "")
         self.access_token = fortress_credentials.get("FORTRESS_ACCESS_TOKEN", "")
         self.master_key = fortress_credentials.get("FORTRESS_MASTER_KEY", "")
