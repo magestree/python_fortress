@@ -1,59 +1,59 @@
 # Python Fortress
 
-Python Fortress es una librería que facilita la interacción con la API para recuperar un archivo `.env`. Está diseñada para cargar de forma segura y eficiente las variables de entorno desde una fuente remota.
+Python Fortress is a library designed to facilitate interaction with an API to retrieve an .env file. It's designed for securely and efficiently loading environment variables from a remote source.
 
-[![codecov](https://codecov.io/gh/magestree/python_fortress/branch/main/graph/badge.svg)](https://codecov.io/gh/magestree/python_fortress)
+[![codecov](https://codecov.io/gh/magestree/python_fortress/branch/develop/graph/badge.svg)](https://codecov.io/gh/magestree/python_fortress)
 
-## Características
+## Features
 
-- Carga fácil de credenciales y configuraciones desde variables de entorno.
-- Recuperación segura del contenido del archivo `.env` desde una API.
-- Uso sencillo y eficiente con métodos intuitivos.
+- Easy loading of credentials and configurations from environment variables.
+- Secure retrieval of the `.env` file content from an API.
+- Simple and efficient usage with intuitive methods.
 
-## Instalación
+## Installation
 
-Para instalar las dependencias del proyecto, ejecuta:
+To install the project dependencies, run:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Uso básico
+## Basic usage
 
-El módulo principal fortress.py proporciona la clase `Fortress` y una función de conveniencia `load_env()`.
+The main module `fortress.py` provides the `Fortress` class and a convenience function `load_env()`.
 
-Ejemplo:
+## Example:
 ```python
 from fortress import load_env
 
-# Carga las variables del archivo .env en las variables de entorno.
 load_env()
 ```
 
 ## Tests
-El proyecto viene con un conjunto de tests para garantizar que todo funcione correctamente. Puedes ejecutar los tests usando pytest:
+The project comes with a set of tests to ensure everything works as expected. You can run the tests using pytest:
+
 ```bash
 pytest
 ```
 
-Para obtener un informa de cobertura:
+To obtain a coverage report:
 ```bash
 coverage run -m pytest
 coverage report
 ```
 
 ## CI/CD
-Gracias a GitHub Actions, cada push o pull request activará la pipeline de CI que ejecutará los tests y calculará la cobertura de código.
+Thanks to GitHub Actions, each push or pull request will trigger the CI pipeline which will run tests and calculate code coverage.
 
 
-## Contribución
-Si estás interesado en contribuir al proyecto, por favor, sigue los siguientes pasos:
+## Contribution
+If you're interested in contributing to the project, please follow these steps:
 
-1. Haz un fork del repositorio.
-2. Crea una nueva rama para tu característica o corrección.
-3. Implementa tu cambio o corrección.
-4. Ejecuta los tests para asegurarte de que todo funciona como se espera.
-5. Abre un pull request.
+1. Fork repository.
+2. Create a new branch for your feature or fix.
+3. Implement your change or fix.
+4. Run the tests to make sure everything is working as expected.
+5. Open a pull request.
 
 
 ## Licencia
