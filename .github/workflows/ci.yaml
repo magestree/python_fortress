@@ -16,10 +16,13 @@ jobs:
       with:
         python-version: 3.8
 
-    - name: Install Dependencies
+    - name: Install Production Dependencies
       run: |
         pip install -r requirements.txt
-        pip install pytest coverage
+
+    - name: Install Development Dependencies
+      run: |
+        pip install -r requirements_dev.txt
 
     - name: Run Tests with Coverage
       run: |
