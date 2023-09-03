@@ -12,7 +12,7 @@ def fortress():
 
 
 def test_load_fortress_credentials(fortress):
-    def mock_dotenv_loader():
+    def mock_dotenv_loader(_=None):
         return {
             "FORTRESS_API_KEY": "mock_api_key",
             "FORTRESS_ACCESS_TOKEN": "mock_access_token",
@@ -82,3 +82,19 @@ def test_load_env(fortress):
 
     os.environ.clear()
     os.environ.update(original_env)
+
+
+def test_load_env_failure(fortress, mocker):
+    mocker.patch.object(fortress, 'get_envfile', return_value=None)
+    result = fortress.load_env()
+    assert result is False
+
+
+def test_load_env_function(mocker):
+    mock_instance = mocker.patch('python_fortress.fortress.Fortress', autospec=True)
+    from python_fortress.fortress import load_env
+    load_env()
+    mock_instance.return_value.load_env.assert_called_once()
+
+
+

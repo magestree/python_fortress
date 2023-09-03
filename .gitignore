@@ -63,3 +63,5 @@ logs/
 # Other
 *.swp
 *.swo
+publish.sh
+pypi_token.txt
