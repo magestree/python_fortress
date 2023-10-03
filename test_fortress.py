@@ -1,4 +1,5 @@
 import os
+import uuid
 
 import pytest
 import requests_mock
@@ -11,70 +12,85 @@ def fortress():
     return Fortress()
 
 
-def test_load_fortress_credentials(fortress):
-    def mock_dotenv_loader(_=None):
-        return {
-            "FORTRESS_API_KEY": "mock_api_key",
-            "FORTRESS_ACCESS_TOKEN": "mock_access_token",
-            "FORTRESS_MASTER_KEY": "mock_master_key",
-            "FORTRESS_ENVFILE_NAME": "mock_envfile_name",
-        }
+@pytest.fixture
+def credentials():
+    return {
+        "api_key": "test_api_key",
+        "access_token": "test_access_token",
+        "master_key": "master_key",
+    }
 
-    fortress.load_fortress_credentials(dotenv_loader=mock_dotenv_loader)
 
-    assert fortress.api_key == "mock_api_key"
-    assert fortress.access_token == "mock_access_token"
-    assert fortress.master_key == "mock_master_key"
-    assert fortress.envfile_name == "mock_envfile_name"
+def test_configure(fortress, credentials):
+    fortress.configure(**credentials)
+    assert fortress.api_key == credentials["api_key"]
+    assert fortress.access_token == credentials["access_token"]
+    assert fortress.master_key == credentials["master_key"]
 
 
 def test_build_url(fortress):
     endpoint = "sample-endpoint/"
-    constructed_url = fortress._build_url(endpoint)
-    assert constructed_url == f"{BASE_URL}{endpoint}"
+    url = fortress._build_url(endpoint)
+    assert url == f"{BASE_URL}{endpoint}"
 
 
-def test_load_headers(fortress):
-    fortress.access_token = "sample_token"
-    fortress.load_headers()
-    assert fortress.headers == {"Authorization": "Bearer sample_token"}
+def test_headers_without_configure(fortress):
+    assert fortress.headers == {"Authorization": "Bearer None"}
 
 
-def test_get_envfile_success(fortress):
+def test_headers_with_configure(fortress, credentials):
+    fortress.configure(**credentials)
+    assert fortress.headers == {"Authorization": f"Bearer {fortress.access_token}"}
+
+
+def test_get_envfile(fortress, credentials):
+    fortress.configure(**credentials)
+    envfile_id = uuid.uuid4().__str__()
+    url = fortress._build_url(f"get-secret/{envfile_id}/")
+
     with requests_mock.Mocker() as m:
         mock_response = {
             "success": True,
-            "message": "OK",
-            "envfile_data": {"value": "KEY=VALUE\nANOTHER_KEY=ANOTHER_VALUE\n"}
+            "secret_data": {
+                "secret_type": "envfile",
+                "uuid": envfile_id,
+                "name": "test_envfile_name",
+                "container": {},
+                "value": "KEY=VALUE\nANOTHER_KEY=ANOTHER_VALUE\n",
+                "notes": None,
+            },
+            "message": "envfile successfully retrieved.",
         }
-        m.post(f'{BASE_URL}get-envfile/', json=mock_response)
-        envfile_content = fortress.get_envfile()
+
+        m.post(url=url, json=mock_response)
+        envfile_content = fortress.get_envfile(envfile_id)
         assert envfile_content == "KEY=VALUE\nANOTHER_KEY=ANOTHER_VALUE\n"
 
 
-def test_get_envfile_failure(fortress):
-    with requests_mock.Mocker() as m:
-        mock_response = {
-            "success": False,
-            "message": "Unauthorized customer",
-            "envfile_data": {}
-        }
-        m.post(f'{BASE_URL}get-envfile/', json=mock_response, status_code=401)
-        envfile_content = fortress.get_envfile()
-        assert envfile_content is None
+def test_load_env(fortress, credentials):
+    fortress.configure(**credentials)
+    envfile_id = uuid.uuid4().__str__()
+    url = fortress._build_url(f"get-secret/{envfile_id}/")
 
-
-def test_load_env(fortress):
     original_env = dict(os.environ)
+    assert os.environ.get('KEY') is None
+    assert os.environ.get('ANOTHER_KEY') is None
 
     with requests_mock.Mocker() as m:
         mock_response = {
             "success": True,
-            "message": "OK",
-            "envfile_data": {"value": "KEY=VALUE\nANOTHER_KEY=ANOTHER_VALUE\n"}
+            "secret_data": {
+                "secret_type": "envfile",
+                "uuid": envfile_id,
+                "name": "test_envfile_name",
+                "container": {},
+                "value": "KEY=VALUE\nANOTHER_KEY=ANOTHER_VALUE\n",
+                "notes": None,
+            },
+            "message": "envfile successfully retrieved.",
         }
-        m.post(f'{BASE_URL}get-envfile/', json=mock_response)
-        result = fortress.load_env()
+        m.post(url=url, json=mock_response)
+        result = fortress.load_env(envfile_id)
 
         assert result is True
         assert os.environ.get('KEY') == 'VALUE'
@@ -82,19 +98,3 @@ def test_load_env(fortress):
 
     os.environ.clear()
     os.environ.update(original_env)
-
-
-def test_load_env_failure(fortress, mocker):
-    mocker.patch.object(fortress, 'get_envfile', return_value=None)
-    result = fortress.load_env()
-    assert result is False
-
-
-def test_load_env_function(mocker):
-    mock_instance = mocker.patch('python_fortress.fortress.Fortress', autospec=True)
-    from python_fortress.fortress import load_env
-    load_env()
-    mock_instance.return_value.load_env.assert_called_once()
-
-
-
