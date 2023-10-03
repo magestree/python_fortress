@@ -1,3 +1,4 @@
+import json
 import logging
 from io import StringIO
 from typing import Optional
@@ -61,9 +62,10 @@ class Fortress:
             "master_key": self.master_key,
             "secret_type": "envfile",
         }
-        response = requests.post(url=url, data=data, headers=self.headers)
+        response = requests.post(url=url, json=data, headers=self.headers)
         if response.status_code == 200:
-            return response.json().get("secret_data", {}).get("value")
+            envfile = json.loads(response.content).get("secret_data", {}).get("value")
+            return envfile
 
         logger.error(f"Error getting envfile. Code: {response.status_code}. message: {response.text}")
         return None
